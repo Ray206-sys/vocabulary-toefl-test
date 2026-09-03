@@ -124,11 +124,12 @@ function showExample() {
     showScreen('exampleScreen');
 }
 
-// Handle Click on Example Screen
-document.getElementById('exampleScreen').addEventListener('click', () => {
+// Handle Click on Example Screen - Using event delegation for reliability
+function handleExampleScreenClick() {
+    if (!gameState.answered) return; // Only allow click after question is answered
     gameState.currentQuestionIndex++;
     loadNextQuestion();
-});
+}
 
 // Show Result
 function showResult() {
@@ -137,17 +138,45 @@ function showResult() {
 }
 
 // Handle Click on Result Screen
-document.getElementById('resultScreen').addEventListener('click', () => {
+function handleResultScreenClick() {
     showScreen('homeScreen');
     initializeGame();
-});
+}
 
-// Start Button Click Event
-document.getElementById('startButton').addEventListener('click', () => {
-    initializeGame();
-});
+// Initialize all event listeners when DOM is ready
+function initializeEventListeners() {
+    // Example screen click
+    const exampleScreen = document.getElementById('exampleScreen');
+    if (exampleScreen) {
+        exampleScreen.removeEventListener('click', handleExampleScreenClick);
+        exampleScreen.addEventListener('click', handleExampleScreenClick);
+    }
 
-// Initialize home screen on load
-window.addEventListener('load', () => {
+    // Result screen click
+    const resultScreen = document.getElementById('resultScreen');
+    if (resultScreen) {
+        resultScreen.removeEventListener('click', handleResultScreenClick);
+        resultScreen.addEventListener('click', handleResultScreenClick);
+    }
+
+    // Start button click
+    const startButton = document.getElementById('startButton');
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            initializeGame();
+        });
+    }
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    initializeEventListeners();
     showScreen('homeScreen');
 });
+
+// Fallback for older browsers
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeEventListeners);
+} else {
+    initializeEventListeners();
+}
