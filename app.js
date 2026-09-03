@@ -29,24 +29,29 @@ function initializeGame() {
 
 // Load Next Question
 function loadNextQuestion() {
-    if (gameState.currentQuestionIndex >= 2000) {
+    const total = gameState.shuffledData.length;
+
+    if (gameState.currentQuestionIndex >= total) {
         showResult();
         return;
     }
 
     gameState.answered = false;
-    gameState.currentQuestion = gameState.shuffledData[gameState.currentQuestionIndex % gameState.shuffledData.length];
+    gameState.currentQuestion = gameState.shuffledData[gameState.currentQuestionIndex];
+
+    // ★修正1: 問題画面に戻す処理が抜けていたため追加
+    showScreen('questionScreen');
 
     // Update progress
-    document.getElementById('progressText').textContent = 
-        `Question ${gameState.currentQuestionIndex + 1} / 2000`;
+    document.getElementById('progressText').textContent =
+        `Question ${gameState.currentQuestionIndex + 1} / ${total}`;
 
     // Display question word
     document.getElementById('questionWord').textContent = gameState.currentQuestion.word;
 
     // Generate and shuffle choices
     generateChoices();
-    
+
     // Reset button styles
     document.querySelectorAll('.choice-button').forEach(btn => {
         btn.disabled = false;
@@ -61,7 +66,7 @@ function generateChoices() {
 
     // Get random incorrect answers from other words
     const otherWords = gameState.shuffledData.filter(word => word.id !== gameState.currentQuestion.id);
-    
+
     while (choices.length < 4) {
         const randomWord = otherWords[Math.floor(Math.random() * otherWords.length)];
         if (!choices.includes(randomWord.meaning)) {
@@ -86,7 +91,7 @@ function checkAnswer(button, selectedMeaning) {
     if (gameState.answered) return;
 
     gameState.answered = true;
-    
+
     const isCorrect = selectedMeaning === gameState.currentQuestion.meaning;
 
     // Disable all buttons
@@ -107,76 +112,3 @@ function checkAnswer(button, selectedMeaning) {
             }
         });
     }
-
-    // Show example after a short delay
-    setTimeout(() => {
-        showExample();
-    }, 500);
-}
-
-// Show Example Sentence
-function showExample() {
-    document.getElementById('exampleWord').textContent = gameState.currentQuestion.word;
-    document.getElementById('exampleDefinition').textContent = 
-        `${gameState.currentQuestion.partOfSpeech} ${gameState.currentQuestion.meaning}`;
-    document.getElementById('exampleSentence').textContent = gameState.currentQuestion.exampleSentence;
-    
-    showScreen('exampleScreen');
-}
-
-// Handle Click on Example Screen - Using event delegation for reliability
-function handleExampleScreenClick() {
-    if (!gameState.answered) return; // Only allow click after question is answered
-    gameState.currentQuestionIndex++;
-    loadNextQuestion();
-}
-
-// Show Result
-function showResult() {
-    document.getElementById('resultText').textContent = `${gameState.correctAnswers} / 2000`;
-    showScreen('resultScreen');
-}
-
-// Handle Click on Result Screen
-function handleResultScreenClick() {
-    showScreen('homeScreen');
-    initializeGame();
-}
-
-// Initialize all event listeners when DOM is ready
-function initializeEventListeners() {
-    // Example screen click
-    const exampleScreen = document.getElementById('exampleScreen');
-    if (exampleScreen) {
-        exampleScreen.removeEventListener('click', handleExampleScreenClick);
-        exampleScreen.addEventListener('click', handleExampleScreenClick);
-    }
-
-    // Result screen click
-    const resultScreen = document.getElementById('resultScreen');
-    if (resultScreen) {
-        resultScreen.removeEventListener('click', handleResultScreenClick);
-        resultScreen.addEventListener('click', handleResultScreenClick);
-    }
-
-    // Start button click
-    const startButton = document.getElementById('startButton');
-    if (startButton) {
-        startButton.addEventListener('click', () => {
-            initializeGame();
-        });
-    }
-}
-
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-    initializeEventListeners();
-    showScreen('homeScreen');
-});
-
-// Fallback for older browsers
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeEventListeners);
-} else {
-    initializeEventListeners();
-}
