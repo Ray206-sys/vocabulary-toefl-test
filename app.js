@@ -39,20 +39,15 @@ function loadNextQuestion() {
     gameState.answered = false;
     gameState.currentQuestion = gameState.shuffledData[gameState.currentQuestionIndex];
 
-    // ★修正1: 問題画面に戻す処理が抜けていたため追加
     showScreen('questionScreen');
 
-    // Update progress
     document.getElementById('progressText').textContent =
         `Question ${gameState.currentQuestionIndex + 1} / ${total}`;
 
-    // Display question word
     document.getElementById('questionWord').textContent = gameState.currentQuestion.word;
 
-    // Generate and shuffle choices
     generateChoices();
 
-    // Reset button styles
     document.querySelectorAll('.choice-button').forEach(btn => {
         btn.disabled = false;
         btn.classList.remove('correct', 'incorrect');
@@ -64,7 +59,6 @@ function generateChoices() {
     const correctAnswer = gameState.currentQuestion.meaning;
     const choices = [correctAnswer];
 
-    // Get random incorrect answers from other words
     const otherWords = gameState.shuffledData.filter(word => word.id !== gameState.currentQuestion.id);
 
     while (choices.length < 4) {
@@ -74,10 +68,8 @@ function generateChoices() {
         }
     }
 
-    // Shuffle choices
     const shuffledChoices = choices.sort(() => Math.random() - 0.5);
 
-    // Display choices
     const buttons = document.querySelectorAll('.choice-button');
     buttons.forEach((button, index) => {
         button.textContent = shuffledChoices[index];
@@ -94,21 +86,81 @@ function checkAnswer(button, selectedMeaning) {
 
     const isCorrect = selectedMeaning === gameState.currentQuestion.meaning;
 
-    // Disable all buttons
     document.querySelectorAll('.choice-button').forEach(btn => {
         btn.disabled = true;
     });
 
-    // Show result
     if (isCorrect) {
         button.classList.add('correct');
         gameState.correctAnswers++;
     } else {
         button.classList.add('incorrect');
-        // Show correct answer
         document.querySelectorAll('.choice-button').forEach(btn => {
             if (btn.dataset.meaning === gameState.currentQuestion.meaning) {
                 btn.classList.add('correct');
             }
         });
     }
+
+    setTimeout(() => {
+        showExample();
+    }, 500);
+}
+
+// Show Example Sentence
+function showExample() {
+    document.getElementById('exampleWord').textContent = gameState.currentQuestion.word;
+    document.getElementById('exampleDefinition').textContent =
+        `${gameState.currentQuestion.partOfSpeech} ${gameState.currentQuestion.meaning}`;
+    document.getElementById('exampleSentence').textContent = gameState.currentQuestion.exampleSentence;
+
+    showScreen('exampleScreen');
+}
+
+// Handle Click on Example Screen
+function handleExampleScreenClick() {
+    if (!gameState.answered) return;
+    gameState.currentQuestionIndex++;
+    loadNextQuestion();
+}
+
+// Show Result
+function showResult() {
+    const total = gameState.shuffledData.length;
+    document.getElementById('resultText').textContent = `${gameState.correctAnswers} / ${total}`;
+    showScreen('resultScreen');
+}
+
+// Handle Click on Result Screen
+function handleResultScreenClick() {
+    showScreen('homeScreen');
+    initializeGame();
+}
+
+// Initialize all event listeners
+function initializeEventListeners() {
+    const exampleScreen = document.getElementById('exampleScreen');
+    if (exampleScreen) {
+        exampleScreen.removeEventListener('click', handleExampleScreenClick);
+        exampleScreen.addEventListener('click', handleExampleScreenClick);
+    }
+
+    const resultScreen = document.getElementById('resultScreen');
+    if (resultScreen) {
+        resultScreen.removeEventListener('click', handleResultScreenClick);
+        resultScreen.addEventListener('click', handleResultScreenClick);
+    }
+
+    const startButton = document.getElementById('startButton');
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            initializeGame();
+        });
+    }
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    initializeEventListeners();
+    showScreen('homeScreen');
+});
