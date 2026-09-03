@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEFL TEST - Vocabulary</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Home Screen -->
+    <div id="homeScreen" class="screen active">
+        <div class="container">
+            <h1 class="title">TOEFL TEST</h1>
+            <button id="startButton" class="start-button">Start</button>
+        </div>
+    </div>
+
+    <!-- Question Screen -->
+    <div id="questionScreen" class="screen">
+        <div class="container">
+            <div class="progress">
+                <p id="progressText">Question 1 / 2000</p>
+            </div>
+            <div class="question-section">
+                <h2 id="questionWord" class="question-word"></h2>
+            </div>
+            <div class="choices-section">
+                <button class="choice-button" data-index="0"></button>
+                <button class="choice-button" data-index="1"></button>
+                <button class="choice-button" data-index="2"></button>
+                <button class="choice-button" data-index="3"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Example Sentence Screen -->
+    <div id="exampleScreen" class="screen">
+        <div class="container">
+            <div class="example-section">
+                <h2 id="exampleWord" class="example-word"></h2>
+                <p id="exampleDefinition" class="example-definition"></p>
+                <p id="exampleSentence" class="example-sentence"></p>
+            </div>
+            <p class="click-hint">Click anywhere to continue...</p>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="resultScreen" class="screen">
+        <div class="container">
+            <h2 class="result-title">Test Completed!</h2>
+            <div class="result-score">
+                <p id="resultText" class="result-text"></p>
+            </div>
+            <p class="click-hint">Click anywhere to return to home...</p>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
